@@ -80,6 +80,7 @@ const User = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-white">
             <tr>
+              <th className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">No</th>
               <th className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">Username</th>
               <th className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">Name</th>
               <th className="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider">Email</th>
