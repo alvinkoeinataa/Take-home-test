@@ -4,15 +4,20 @@ import axios from "axios";
 const User = () => {
   const [dataUser, setDataUser] = useState([]);
   const [search, setSearch] = useState("");
+  const [selectedGender, setSelectedGender] = useState("All"); // Default to "All" gender
 
   const fetchData = () => {
+    let apiUrl = `https://randomuser.me/api/?page=1&pageSize=10&results=10`;
+
+    if (selectedGender !== "All") {
+      apiUrl += `&gender=${selectedGender.toLowerCase()}`;
+    }
+
     axios({
       method: "get",
-      // url: `https://randomuser.me/api/?results=5`,
-      url: `https://randomuser.me/api/?page=1&pageSize=10&results=10`,
+      url: apiUrl,
     })
       .then((response) => {
-        // console.log(response.data);
         setDataUser(response.data.results);
       })
       .catch((error) => {
@@ -45,32 +50,38 @@ const User = () => {
     }
   };
 
+  const handleGenderChange = (e) => {
+    setSelectedGender(e.target.value);
+  };
+
   const handleResetFilter = () => {
+    setSelectedGender("All"); // Reset gender filter
     fetchData();
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [selectedGender]); // Fetch data when selectedGender changes
 
   return (
     <div className="min-h-screen">
       <div className="px-40">
-        <div className="flex flex-row items-center ">
+        <div className="flex flex-row items-center">
           <h1 className="text-xl font-semibold mb-4 mr-60">Search</h1>
-          <h1 className="text-xl font-semibold mb-4">gender</h1>
+          <h1 className="text-xl font-semibold mb-4">Gender</h1>
         </div>
 
         <div className="">
-          <input type="text" placeholder="search" className="" onChange={(e) => setSearch(e.target.value)} onKeyPress={handleInputKeyPress} />
-          <button className="bg-blue-500 mr-4 px-2" onClick={handleSearchClick}>
-            <i className="fas fa-search"></i>
-          </button>
-          <select name="cars" id="cars" className="bg-white px-8 py-1 mr-4">
+          {/* Gender filter dropdown */}
+          <select name="gender" id="gender" className="bg-white px-8 py-1 mr-4" value={selectedGender} onChange={handleGenderChange}>
             <option value="All">All</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
           </select>
+          <input type="text" placeholder="search" className="" onChange={(e) => setSearch(e.target.value)} onKeyPress={handleInputKeyPress} />
+          <button className="bg-blue-500 mr-4 px-2" onClick={handleSearchClick}>
+            <i className="fas fa-search"></i>
+          </button>
           <button className="bg-white" onClick={handleResetFilter}>
             Reset Filter
           </button>

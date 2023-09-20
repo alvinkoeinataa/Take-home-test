@@ -4,6 +4,7 @@ import axios from "axios";
 const User = () => {
   const [dataUser, setDataUser] = useState([]);
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   const fetchData = () => {
     axios({
@@ -32,11 +33,17 @@ const User = () => {
   }
 
   const handleSearchClick = () => {
-    const filteredData = dataUser.filter((item) => {
-      return item.login.username.toLowerCase().includes(search.toLowerCase()) || `${item.name.first} ${item.name.last}`.toLowerCase().includes(search.toLowerCase()) || item.email.toLowerCase().includes(search.toLowerCase());
-    });
-
-    setDataUser(filteredData);
+    axios({
+      method: "get",
+      url: `https://randomuser.me/api/?page=1&pageSize=10&results=10&email=mar`,
+    })
+      .then((response) => {
+        setSearchResults(response.data.results);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("Error, reload the page!");
+      });
   };
 
   const handleInputKeyPress = (e) => {
@@ -46,7 +53,8 @@ const User = () => {
   };
 
   const handleResetFilter = () => {
-    fetchData();
+    setSearchResults([]); // Mengosongkan hasil pencarian
+    setSearch(""); // Mengosongkan field pencarian
   };
 
   useEffect(() => {
@@ -90,18 +98,31 @@ const User = () => {
             </tr>
           </thead>
           <tbody>
-            {dataUser.map((item, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                <td>{index + 1}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.login.username}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {item.name.first} {item.name.last}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{item.gender}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{konversiTanggal(item.registered.date)}</td>
-              </tr>
-            ))}
+            {searchResults.length > 0
+              ? searchResults.map((item, index) => (
+                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td>{index + 1}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.login.username}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.name.first} {item.name.last}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.gender}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{konversiTanggal(item.registered.date)}</td>
+                  </tr>
+                ))
+              : dataUser.map((item, index) => (
+                  <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td>{index + 1}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.login.username}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {item.name.first} {item.name.last}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{item.gender}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{konversiTanggal(item.registered.date)}</td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>
