@@ -3,17 +3,19 @@ import axios from "axios";
 
 const User = () => {
   const [dataUser, setDataUser] = useState([]);
+  const [dataUserAll, setDataUserAll] = useState([]);
   const [search, setSearch] = useState("");
+  const [gender, setGender] = useState("All");
 
   const fetchData = () => {
     axios({
       method: "get",
-      // url: `https://randomuser.me/api/?results=5`,
-      url: `https://randomuser.me/api/?page=1&pageSize=10&results=10`,
+      url: `https://randomuser.me/api/?page=1&pageSize=10&results=100&seed=aaaa`,
     })
       .then((response) => {
-        // console.log(response.data);
+        // console.log(response.data.results);
         setDataUser(response.data.results);
+        setDataUserAll(response.data.results); // full nya
       })
       .catch((error) => {
         console.log(error);
@@ -31,12 +33,37 @@ const User = () => {
     return `${dd}-${mm}-${yyyy} ${jam}:${menit}`;
   }
 
-  const handleSearchClick = () => {
-    const filteredData = dataUser.filter((item) => {
-      return item.login.username.toLowerCase().includes(search.toLowerCase()) || `${item.name.first} ${item.name.last}`.toLowerCase().includes(search.toLowerCase()) || item.email.toLowerCase().includes(search.toLowerCase());
-    });
+  const handleAllFilter = (search, gender) => {
+    let filteredData = dataUserAll;
 
+    // implement filter search
+    if (search.length > 0) {
+      filteredData = filteredData.filter((item) => {
+        return item.login.username.toLowerCase().includes(search.toLowerCase()) || `${item.name.first} ${item.name.last}`.toLowerCase().includes(search.toLowerCase()) || item.email.toLowerCase().includes(search.toLowerCase());
+      });
+    }
+
+    // implement filter gender
+    if (gender === "Male" || gender === "Female") {
+      filteredData = filteredData.filter((item) => {
+        return item.gender.toLowerCase() === gender.toLowerCase();
+      });
+    }
+
+    // update data user
     setDataUser(filteredData);
+
+    // update state
+    setGender(gender);
+    setSearch(search);
+  };
+
+  const handleSearchClick = () => {
+    handleAllFilter(search, gender);
+  };
+
+  const handleChangeGender = (selectedgender) => {
+    handleAllFilter(search, selectedgender);
   };
 
   const handleInputKeyPress = (e) => {
@@ -66,7 +93,7 @@ const User = () => {
           <button className="bg-blue-500 mr-4 px-2" onClick={handleSearchClick}>
             <i className="fas fa-search"></i>
           </button>
-          <select name="cars" id="cars" className="bg-white px-8 py-1 mr-4">
+          <select name="cars" id="cars" onChange={(e) => handleChangeGender(e.target.value)} className="bg-white px-8 py-1 mr-4">
             <option value="All">All</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
